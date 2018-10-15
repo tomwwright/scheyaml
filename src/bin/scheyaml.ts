@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /* tslint:disable:no-console */
 import commander, { CommanderStatic } from "commander";
 import chalk from "chalk";
@@ -5,11 +7,12 @@ import _ from "lodash";
 import figures from "figures";
 import { ErrorObject } from "ajv";
 
-import { defaultConfig, version, IScheyamlConfig } from "./lib/config";
-import { globFiles } from "./lib/utils";
-import * as schema from "./lib/schema";
-import * as ui from "./lib/ui";
-import { ScheyamlDirectiveError, ScheyamlUnknownSchemaError } from "./lib/errors";
+import { Scheyaml } from "../lib/scheyaml";
+import { defaultConfig, version, IScheyamlConfig } from "../lib/config";
+import { globFiles } from "../lib/utils";
+import * as schema from "../lib/schema";
+import * as ui from "../lib/ui";
+import { ScheyamlDirectiveError, ScheyamlUnknownSchemaError } from "../lib/errors";
 
 interface ICliConfig {
   schemasOnly: boolean;
@@ -65,7 +68,7 @@ function runScheyaml(config: IScheyamlConfig) {
   console.log(chalk.yellow(`Found ${schemaFilePaths.length} schemas!`));
 
   console.log();
-  const scheyaml = new schema.Scheyaml();
+  const scheyaml = new Scheyaml();
   for (const schemaFilePath of schemaFilePaths) {
     try {
       const schemaId = scheyaml.addSchema(schemaFilePath);

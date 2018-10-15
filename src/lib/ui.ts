@@ -40,6 +40,7 @@ export function validationFailureHeading(schema: string, file: string) {
 
   return line;
 }
+
 export function validationFailureError(error: ErrorObject) {
   const line = paddington
     .pad(4)
