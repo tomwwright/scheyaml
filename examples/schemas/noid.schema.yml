@@ -1,0 +1,4 @@
+# this example schema will fail to load due to not defining a schema ID
+
+name: string
+number: number

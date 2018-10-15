@@ -1,0 +1,13 @@
+## schema: person
+
+name: Fred
+age: 35
+
+hobbies: []
+
+address:
+  streetNumber: 120
+  street: Street St
+  suburb: Exampleville
+  postcode: 1000
+  state: NSW

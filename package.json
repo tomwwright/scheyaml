@@ -1,0 +1,35 @@
+{
+  "name": "scheyaml",
+  "version": "0.0.1",
+  "description": "Straightforward schema validation for YAML",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf build && tsc",
+    "start": "tsc -w"
+  },
+  "author": "Tom Wright",
+  "license": "ISC",
+  "dependencies": {
+    "ajv": "^6.5.4",
+    "chalk": "^2.4.1",
+    "commander": "^2.19.0",
+    "figures": "^2.0.0",
+    "glob": "^7.1.3",
+    "lodash": "^4.17.11",
+    "paddington": "^0.1.1",
+    "strip-ansi": "^5.0.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "@types/ajv": "^1.0.0",
+    "@types/glob": "^7.1.1",
+    "@types/jsonschema": "^1.1.1",
+    "@types/lodash": "^4.14.117",
+    "@types/yamljs": "^0.2.30",
+    "@types/commander": "^2.12.2",
+    "@types/figures": "^2.0.0",
+    "@types/strip-ansi": "^3.0.0",
+    "typescript": "^3.1.3"
+  }
+}

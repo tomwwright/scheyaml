@@ -1,0 +1,4 @@
+# this example file will skip validation because it does not define any schema directives
+
+unable: to validate schema
+because: file has no schema directives

@@ -1,0 +1,7 @@
+# this example schema will fail to load because it defines multiple schema IDs
+
+## id: firstid
+## id: secondid
+
+name: string
+number: number

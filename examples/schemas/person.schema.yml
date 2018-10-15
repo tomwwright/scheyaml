@@ -1,0 +1,21 @@
+## id: person
+
+name: string
+age: number
+
+hobbies: string[]
+
+address:
+  streetNumber: number
+  street: string
+  suburb: string
+  postcode: number
+  state:
+    - NSW
+    - QLD
+    - VIC
+    - SA
+    - ACT
+    - TAS
+    - WA
+    - NT
