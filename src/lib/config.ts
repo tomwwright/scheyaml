@@ -4,7 +4,7 @@ export interface IScheyamlConfig {
   targetPatterns: string[];
 }
 
-export const defaultConfig = {
+export const defaultConfig: IScheyamlConfig = {
   schemaPatterns: ["**/*.schema.y?(a)ml"],
   schemasOnly: false,
   targetPatterns: ["**/*.y?(a)ml"]
