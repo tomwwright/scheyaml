@@ -8,6 +8,7 @@ import { defaultConfig, version, ScheyamlConfig } from "./lib/config";
 import { globFiles } from "./lib/utils";
 import * as schema from "./lib/schema";
 import * as ui from "./lib/ui";
+import { SchemaDirectiveError, ScheyamlUnknownSchemaError } from "./lib/errors";
 
 type CliConfig = {
   schemasOnly: boolean;
@@ -47,7 +48,7 @@ export function buildConfig(commander: CommanderStatic & CliConfig): ScheyamlCon
   return config;
 }
 
-function scheyaml(config: ScheyamlConfig) {
+function runScheyaml(config: ScheyamlConfig) {
   let exitWithError = false;
 
   console.log(`scheyaml v${version}`);
@@ -57,7 +58,20 @@ function scheyaml(config: ScheyamlConfig) {
   console.log(chalk.yellow(`Found ${schemaFilePaths.length} schemas!`));
 
   console.log();
-  const validator = schema.loadSchemas(schemaFilePaths);
+  const scheyaml = new schema.Scheyaml();
+  for (const schemaFilePath of schemaFilePaths) {
+    try {
+      const schemaId = scheyaml.addSchema(schemaFilePath);
+      ui.loadedSchemaOk(schemaId, schemaFilePath);
+    } catch (e) {
+      if (e instanceof SchemaDirectiveError) {
+        ui.loadedSchemaNoId(schemaFilePath);
+      } else {
+        ui.loadSchemaFail(schemaFilePath);
+        throw e;
+      }
+    }
+  }
   console.log();
 
   if (!config.schemasOnly) {
@@ -69,31 +83,32 @@ function scheyaml(config: ScheyamlConfig) {
     const failures: ValidationFailure[] = [];
     const passes: { schemaId: string; filePath: string }[] = [];
     for (const filePath of targetFilePaths) {
-      const { json, schemaIds } = schema.loadTarget(filePath);
+      try {
+        const validation = scheyaml.validate(filePath);
 
-      if (schemaIds.length == 0) ui.validateNoSchemas(filePath);
+        passes.push(
+          ...validation.passes.map(pass => ({
+            filePath,
+            schemaId: pass.schemaId
+          }))
+        );
+        validation.passes.forEach(pass => ui.validateOk(pass.schemaId, filePath));
 
-      for (const schemaId of schemaIds) {
-        const schemaValidator = validator.getSchema(schemaId);
-        if (!schemaValidator) {
-          ui.validateUnknownSchema(schemaId, filePath);
+        failures.push(
+          ...validation.failures.map(failure => ({
+            filePath,
+            schemaId: failure.schemaId,
+            errors: failure.errors
+          }))
+        );
+        validation.failures.forEach(failure => ui.validateFailed(failure.schemaId, filePath));
+      } catch (e) {
+        if (e instanceof ScheyamlUnknownSchemaError) {
+          ui.validateUnknownSchema(e.schemaId, filePath);
+        } else if (e instanceof SchemaDirectiveError) {
+          ui.validateNoSchemas(filePath);
         } else {
-          const validation = schemaValidator(json);
-
-          if (validation) {
-            ui.validateOk(schemaId, filePath);
-            passes.push({
-              schemaId,
-              filePath
-            });
-          } else {
-            ui.validateFailed(schemaId, filePath);
-            failures.push({
-              schemaId: schemaId,
-              filePath: filePath,
-              errors: schemaValidator.errors
-            });
-          }
+          throw e;
         }
       }
     }
@@ -129,4 +144,4 @@ function scheyaml(config: ScheyamlConfig) {
 
 const config = cli();
 
-scheyaml(config);
+runScheyaml(config);
