@@ -2,21 +2,21 @@ import Ajv from "ajv";
 import fs from "fs";
 import yamljs from "yamljs";
 
-import { SchemaDirectiveError, ScheyamlUnknownSchemaError } from "./errors";
+import { ScheyamlDirectiveError, ScheyamlUnknownSchemaError } from "./errors";
 import { extractDirectives } from "./utils";
 
 export function loadFile(path: string) {
   const text = fs.readFileSync(path).toString();
   const directives = extractDirectives(text);
   return {
-    json: yamljs.parse(text),
-    directives
+    directives,
+    json: yamljs.parse(text)
   };
 }
 
 export function loadTarget(path: string) {
   const { json, directives } = loadFile(path);
-  const schemaIds = directives.filter(directive => directive.key == "schema").map(directive => directive.value);
+  const schemaIds = directives.filter(directive => directive.key === "schema").map(directive => directive.value);
   return {
     json,
     schemaIds
@@ -25,11 +25,11 @@ export function loadTarget(path: string) {
 
 export function loadSchema(path: string) {
   const { json, directives } = loadFile(path);
-  const schemaIds = directives.filter(directive => directive.key == "id");
-  if (schemaIds.length == 0) {
-    throw new SchemaDirectiveError(`File '${path}' does not contain a schema ID directive! ('## id: <schemaid>')`);
+  const schemaIds = directives.filter(directive => directive.key === "id");
+  if (schemaIds.length === 0) {
+    throw new ScheyamlDirectiveError(`File '${path}' does not contain a schema ID directive! ('## id: <schemaid>')`);
   } else if (schemaIds.length > 1) {
-    throw new SchemaDirectiveError(`File '${path}' contains multiple schema ID directives! ('## id: <schemaid>')`);
+    throw new ScheyamlDirectiveError(`File '${path}' contains multiple schema ID directives! ('## id: <schemaid>')`);
   }
 
   return {
@@ -38,8 +38,10 @@ export function loadSchema(path: string) {
   };
 }
 
-export function inflateSchema(raw: any): Schema {
-  if (typeof raw.type === "string") return raw;
+export function inflateSchema(raw: any): ISchema {
+  if (typeof raw.type === "string") {
+    return raw;
+  }
 
   if (typeof raw === "string") {
     if (raw.endsWith("[]")) {
@@ -67,9 +69,9 @@ export function inflateSchema(raw: any): Schema {
       properties: {},
       required: []
     };
-    for (const property in raw) {
-      inflated.properties[property] = inflateSchema(raw[property]);
-      inflated.required.push(property);
+    for (const key of Object.keys(raw)) {
+      inflated.properties[key] = inflateSchema(raw[key]);
+      inflated.required.push(key);
     }
     return inflated;
   }
@@ -77,7 +79,7 @@ export function inflateSchema(raw: any): Schema {
   return raw;
 }
 
-export interface Schema {
+export interface ISchema {
   id?: string;
   $schema?: string;
   $ref?: string;
@@ -91,52 +93,52 @@ export interface Schema {
   maxLength?: number;
   minLength?: number;
   pattern?: string;
-  additionalItems?: boolean | Schema;
-  items?: Schema | Schema[];
+  additionalItems?: boolean | ISchema;
+  items?: ISchema | ISchema[];
   maxItems?: number;
   minItems?: number;
   uniqueItems?: boolean;
   maxProperties?: number;
   minProperties?: number;
   required?: string[];
-  additionalProperties?: boolean | Schema;
+  additionalProperties?: boolean | ISchema;
   definitions?: {
-    [name: string]: Schema;
+    [name: string]: ISchema;
   };
   properties?: {
-    [name: string]: Schema;
+    [name: string]: ISchema;
   };
   patternProperties?: {
-    [name: string]: Schema;
+    [name: string]: ISchema;
   };
   dependencies?: {
-    [name: string]: Schema | string[];
+    [name: string]: ISchema | string[];
   };
   enum?: any[];
   type?: string | string[];
   format?: string;
-  allOf?: Schema[];
-  anyOf?: Schema[];
-  oneOf?: Schema[];
-  not?: Schema;
+  allOf?: ISchema[];
+  anyOf?: ISchema[];
+  oneOf?: ISchema[];
+  not?: ISchema;
 }
 
-export interface ScheyamlValidation {
+export interface IScheyamlValidation {
   isValid: boolean;
-  passes: {
+  passes: Array<{
     schemaId: string;
-  }[];
-  failures: {
+  }>;
+  failures: Array<{
     schemaId: string;
     errors: Ajv.ErrorObject[];
-  }[];
+  }>;
 }
 export class Scheyaml {
   private validator = new Ajv({
     allErrors: true
   });
 
-  addSchema(filePath: string): string {
+  public addSchema(filePath: string): string {
     const schema = loadSchema(filePath);
 
     const inflatedSchema = inflateSchema(schema.json);
@@ -145,12 +147,14 @@ export class Scheyaml {
     return schema.schemaId;
   }
 
-  validate(targetPath: string) {
+  public validate(targetPath: string) {
     const { json, schemaIds } = loadTarget(targetPath);
 
-    if (schemaIds.length == 0) throw new SchemaDirectiveError(`File '${targetPath}' contains no schema directives!`);
+    if (schemaIds.length === 0) {
+      throw new ScheyamlDirectiveError(`File '${targetPath}' contains no schema directives!`);
+    }
 
-    const validation: ScheyamlValidation = {
+    const validation: IScheyamlValidation = {
       isValid: true,
       passes: [],
       failures: []
@@ -170,7 +174,7 @@ export class Scheyaml {
         } else {
           validation.isValid = false;
           validation.failures.push({
-            schemaId: schemaId,
+            schemaId,
             errors: schemaValidator.errors
           });
         }

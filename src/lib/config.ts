@@ -1,13 +1,13 @@
-export type ScheyamlConfig = {
-  targetPatterns: string[];
+export interface IScheyamlConfig {
   schemaPatterns: string[];
   schemasOnly: boolean;
-};
+  targetPatterns: string[];
+}
 
 export const defaultConfig = {
-  targetPatterns: ["**/*.y?(a)ml"],
   schemaPatterns: ["**/*.schema.y?(a)ml"],
-  schemasOnly: false
+  schemasOnly: false,
+  targetPatterns: ["**/*.y?(a)ml"]
 };
 
-export const version = require("../../package.json").version;
+export const version = require("../../package.json").version; // tslint:disable-line

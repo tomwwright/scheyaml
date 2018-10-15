@@ -1,26 +1,27 @@
+/* tslint:disable:no-console */
 import commander, { CommanderStatic } from "commander";
 import chalk from "chalk";
 import _ from "lodash";
 import figures from "figures";
 import { ErrorObject } from "ajv";
 
-import { defaultConfig, version, ScheyamlConfig } from "./lib/config";
+import { defaultConfig, version, IScheyamlConfig } from "./lib/config";
 import { globFiles } from "./lib/utils";
 import * as schema from "./lib/schema";
 import * as ui from "./lib/ui";
-import { SchemaDirectiveError, ScheyamlUnknownSchemaError } from "./lib/errors";
+import { ScheyamlDirectiveError, ScheyamlUnknownSchemaError } from "./lib/errors";
 
-type CliConfig = {
+interface ICliConfig {
   schemasOnly: boolean;
   targets: string[];
   schemas: string[];
-};
+}
 
-type ValidationFailure = {
+interface IValidationFailure {
   schemaId: string;
   filePath: string;
   errors: ErrorObject[];
-};
+}
 
 export function cli() {
   commander
@@ -35,20 +36,26 @@ export function cli() {
     return list;
   }
 
-  return buildConfig(commander as CommanderStatic & CliConfig);
+  return buildConfig(commander as CommanderStatic & ICliConfig);
 }
 
-export function buildConfig(commander: CommanderStatic & CliConfig): ScheyamlConfig {
+export function buildConfig(commanderObj: CommanderStatic & ICliConfig): IScheyamlConfig {
   const config = Object.assign({}, defaultConfig);
 
-  if (commander.schemasOnly) config.schemasOnly = commander.schemasOnly;
-  if (commander.schemas.length > 0) config.schemaPatterns = commander.schemas;
-  if (commander.targets.length > 0) config.targetPatterns = commander.targets;
+  if (commanderObj.schemasOnly) {
+    config.schemasOnly = commanderObj.schemasOnly;
+  }
+  if (commanderObj.schemas.length > 0) {
+    config.schemaPatterns = commanderObj.schemas;
+  }
+  if (commanderObj.targets.length > 0) {
+    config.targetPatterns = commanderObj.targets;
+  }
 
   return config;
 }
 
-function runScheyaml(config: ScheyamlConfig) {
+function runScheyaml(config: IScheyamlConfig) {
   let exitWithError = false;
 
   console.log(`scheyaml v${version}`);
@@ -64,7 +71,7 @@ function runScheyaml(config: ScheyamlConfig) {
       const schemaId = scheyaml.addSchema(schemaFilePath);
       ui.loadedSchemaOk(schemaId, schemaFilePath);
     } catch (e) {
-      if (e instanceof SchemaDirectiveError) {
+      if (e instanceof ScheyamlDirectiveError) {
         ui.loadedSchemaNoId(schemaFilePath);
       } else {
         ui.loadSchemaFail(schemaFilePath);
@@ -80,7 +87,7 @@ function runScheyaml(config: ScheyamlConfig) {
     console.log(chalk.yellow(`Found ${targetFilePaths.length} targets!`));
 
     console.log();
-    const failures: ValidationFailure[] = [];
+    const failures: IValidationFailure[] = [];
     const passes: { schemaId: string; filePath: string }[] = [];
     for (const filePath of targetFilePaths) {
       try {
@@ -105,7 +112,7 @@ function runScheyaml(config: ScheyamlConfig) {
       } catch (e) {
         if (e instanceof ScheyamlUnknownSchemaError) {
           ui.validateUnknownSchema(e.schemaId, filePath);
-        } else if (e instanceof SchemaDirectiveError) {
+        } else if (e instanceof ScheyamlDirectiveError) {
           ui.validateNoSchemas(filePath);
         } else {
           throw e;
@@ -119,16 +126,16 @@ function runScheyaml(config: ScheyamlConfig) {
 
     console.log();
 
-    for (let failure of failures) {
+    for (const failure of failures) {
       ui.validationFailureHeading(failure.schemaId, failure.filePath);
-      for (let error of failure.errors) {
+      for (const error of failure.errors) {
         console.log();
         ui.validationFailureError(error);
       }
       console.log();
     }
 
-    if (numFailed == 0) {
+    if (numFailed === 0) {
       console.log(chalk.green(`== ${figures.tick} ${numPassed} passed, ${numFailed} failed (${numErrors} errors) ==`));
     } else {
       console.log(chalk.red(`== ${figures.cross} ${numPassed} passed, ${numFailed} failed (${numErrors} errors) ==`));
@@ -139,9 +146,11 @@ function runScheyaml(config: ScheyamlConfig) {
   console.log();
   console.log(chalk.yellow(`${figures.tick} Done!`));
 
-  if (exitWithError) process.exit(1);
+  if (exitWithError) {
+    process.exit(1);
+  }
 }
 
-const config = cli();
+const scheyamlConfig = cli();
 
-runScheyaml(config);
+runScheyaml(scheyamlConfig);
