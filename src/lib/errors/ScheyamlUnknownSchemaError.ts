@@ -1,10 +1,7 @@
-import { ScheyamlError } from "./ScheyamlError";
+import { CustomError } from "./CustomError";
 
-export class ScheyamlUnknownSchemaError extends ScheyamlError {
-  public schemaId: string;
-
-  constructor(schemaId: string, message) {
-    super(message);
-    this.schemaId = schemaId;
+export class ScheyamlUnknownSchemaError extends CustomError {
+  constructor(public schemaId: string, message) {
+    super(ScheyamlUnknownSchemaError.prototype, message);
   }
 }

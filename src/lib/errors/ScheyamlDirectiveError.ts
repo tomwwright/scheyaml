@@ -1,3 +1,6 @@
-import { ScheyamlError } from "./ScheyamlError";
-
-export class ScheyamlDirectiveError extends ScheyamlError {}
+import { CustomError } from "./CustomError";
+export class ScheyamlDirectiveError extends CustomError {
+  constructor(message) {
+    super(ScheyamlDirectiveError.prototype, message);
+  }
+}
