@@ -2,14 +2,29 @@
   "name": "scheyaml",
   "version": "0.0.1",
   "description": "Straightforward schema validation for YAML",
-  "main": "index.js",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage",
     "build": "rm -rf build && tsc",
+    "lint": "tslint -p tsconfig.json",
     "start": "tsc -w"
   },
-  "author": "Tom Wright",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomwwright/scheyaml.git"
+  },
+  "keywords": [
+    "yaml",
+    "schemas",
+    "validation"
+  ],
+  "author": "tomwwright",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tomwwright/scheyaml/issues"
+  },
+  "homepage": "https://github.com/tomwwright/scheyaml#readme",
   "dependencies": {
     "ajv": "^6.5.4",
     "chalk": "^2.4.1",
@@ -23,13 +38,19 @@
   },
   "devDependencies": {
     "@types/ajv": "^1.0.0",
-    "@types/glob": "^7.1.1",
-    "@types/jsonschema": "^1.1.1",
-    "@types/lodash": "^4.14.117",
-    "@types/yamljs": "^0.2.30",
     "@types/commander": "^2.12.2",
     "@types/figures": "^2.0.0",
+    "@types/glob": "^7.1.1",
+    "@types/jest": "^23.3.5",
+    "@types/jsonschema": "^1.1.1",
+    "@types/lodash": "^4.14.117",
     "@types/strip-ansi": "^3.0.0",
+    "@types/yamljs": "^0.2.30",
+    "jest": "^23.6.0",
+    "prettier": "^1.14.3",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.3"
   }
 }
