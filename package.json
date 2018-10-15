@@ -2,6 +2,9 @@
   "name": "scheyaml",
   "version": "0.0.1",
   "description": "Straightforward schema validation for YAML",
+  "bin": {
+    "scheyaml": "build/bin/scheyaml.js"
+  },
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
