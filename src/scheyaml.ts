@@ -69,12 +69,12 @@ function runScheyaml(config: IScheyamlConfig) {
   for (const schemaFilePath of schemaFilePaths) {
     try {
       const schemaId = scheyaml.addSchema(schemaFilePath);
-      ui.loadedSchemaOk(schemaId, schemaFilePath);
+      console.log(ui.loadSchemaOk(schemaId, schemaFilePath));
     } catch (e) {
       if (e instanceof ScheyamlDirectiveError) {
-        ui.loadedSchemaNoId(schemaFilePath);
+        console.log(ui.loadSchemaDirectiveError(schemaFilePath, e.message));
       } else {
-        ui.loadSchemaFail(schemaFilePath);
+        console.log(ui.loadSchemaFail(schemaFilePath));
         throw e;
       }
     }
@@ -99,7 +99,7 @@ function runScheyaml(config: IScheyamlConfig) {
             schemaId: pass.schemaId
           }))
         );
-        validation.passes.forEach(pass => ui.validateOk(pass.schemaId, filePath));
+        validation.passes.forEach(pass => console.log(ui.validateOk(pass.schemaId, filePath)));
 
         failures.push(
           ...validation.failures.map(failure => ({
@@ -108,12 +108,12 @@ function runScheyaml(config: IScheyamlConfig) {
             errors: failure.errors
           }))
         );
-        validation.failures.forEach(failure => ui.validateFailed(failure.schemaId, filePath));
+        validation.failures.forEach(failure => console.log(ui.validateFailed(failure.schemaId, filePath)));
       } catch (e) {
         if (e instanceof ScheyamlUnknownSchemaError) {
-          ui.validateUnknownSchema(e.schemaId, filePath);
+          console.log(ui.validateUnknownSchema(e.schemaId, filePath));
         } else if (e instanceof ScheyamlDirectiveError) {
-          ui.validateNoSchemas(filePath);
+          console.log(ui.validateNoSchemas(filePath));
         } else {
           throw e;
         }
@@ -130,7 +130,7 @@ function runScheyaml(config: IScheyamlConfig) {
       ui.validationFailureHeading(failure.schemaId, failure.filePath);
       for (const error of failure.errors) {
         console.log();
-        ui.validationFailureError(error);
+        console.log(ui.validationFailureError(error));
       }
       console.log();
     }

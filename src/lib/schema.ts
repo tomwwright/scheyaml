@@ -27,9 +27,9 @@ export function loadSchema(path: string) {
   const { json, directives } = loadFile(path);
   const schemaIds = directives.filter(directive => directive.key === "id");
   if (schemaIds.length === 0) {
-    throw new ScheyamlDirectiveError(`File '${path}' does not contain a schema ID directive! ('## id: <schemaid>')`);
+    throw new ScheyamlDirectiveError(`File '${path}' does not contain a schema ID directive!`);
   } else if (schemaIds.length > 1) {
-    throw new ScheyamlDirectiveError(`File '${path}' contains multiple schema ID directives! ('## id: <schemaid>')`);
+    throw new ScheyamlDirectiveError(`File '${path}' contains multiple schema ID directives!`);
   }
 
   return {

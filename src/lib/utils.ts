@@ -2,7 +2,7 @@ import glob from "glob";
 import _ from "lodash";
 
 export function dump(json: any) {
-  JSON.stringify(json, null, 2);
+  return JSON.stringify(json, null, 2);
 }
 
 export function globFiles(patterns: string[]) {
@@ -10,7 +10,7 @@ export function globFiles(patterns: string[]) {
 }
 
 export function extractDirectives(text: string) {
-  const directiveMatch = text.match(/^## [\_\-a-zA-Z0-9]+: [\_\-a-zA-Z0-9]+/g) || [];
+  const directiveMatch = text.match(/## [\_\-a-zA-Z0-9]+: [\_\-a-zA-Z0-9]+/g) || [];
   if (!directiveMatch) {
     return [];
   }
