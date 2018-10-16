@@ -113,7 +113,7 @@ describe(".validate", () => {
     loadTargetSpy.mockRestore();
   });
 
-  it("validates a schema of a target -- failure", () => {
+  it("validates multiple schemas of a target -- failure", () => {
     const loadSchemaSpy = jest.spyOn(schema, "loadSchema").mockImplementation((filename: string) => {
       switch (filename) {
         case "stringschema.yml":
@@ -167,7 +167,7 @@ describe(".validate", () => {
     loadTargetSpy.mockRestore();
   });
 
-  it("validates multiple schemas of a target -- failure", () => {
+  it("validates a schema of a target -- failure", () => {
     const loadSchemaSpy = jest.spyOn(schema, "loadSchema").mockImplementation(() => ({
       json: {
         test: "string"
