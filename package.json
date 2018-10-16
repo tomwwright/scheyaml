@@ -9,6 +9,7 @@
   "types": "build/index.d.ts",
   "scripts": {
     "test": "jest --coverage",
+    "test:watch": "jest --watch",
     "build": "rm -rf build && tsc",
     "lint": "tslint -p tsconfig.json",
     "start": "tsc -w"
