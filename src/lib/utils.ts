@@ -6,7 +6,7 @@ export function dump(json: any) {
 }
 
 export function globFiles(patterns: string[]) {
-  return _.flatten(patterns.map(pattern => glob.sync(pattern)));
+  return _.uniq(_.flatten(patterns.map(pattern => glob.sync(pattern))));
 }
 
 export function extractDirectives(text: string) {

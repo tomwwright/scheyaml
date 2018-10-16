@@ -1,6 +1,7 @@
 import fs from "fs";
 import yamljs from "yamljs";
 
+import * as schema from "./schema";
 import { ScheyamlDirectiveError, ScheyamlUnknownSchemaError } from "./errors";
 import { extractDirectives } from "./utils";
 
@@ -14,7 +15,7 @@ export function loadFile(path: string) {
 }
 
 export function loadTarget(path: string) {
-  const { json, directives } = loadFile(path);
+  const { json, directives } = schema.loadFile(path);
   const schemaIds = directives.filter(directive => directive.key === "schema").map(directive => directive.value);
   return {
     json,
@@ -23,7 +24,7 @@ export function loadTarget(path: string) {
 }
 
 export function loadSchema(path: string) {
-  const { json, directives } = loadFile(path);
+  const { json, directives } = schema.loadFile(path);
   const schemaIds = directives.filter(directive => directive.key === "id");
   if (schemaIds.length === 0) {
     throw new ScheyamlDirectiveError(`File '${path}' does not contain a schema ID directive!`);
@@ -38,10 +39,6 @@ export function loadSchema(path: string) {
 }
 
 export function inflateSchema(raw: any): ISchema {
-  if (typeof raw.type === "string") {
-    return raw;
-  }
-
   if (typeof raw === "string") {
     if (raw.endsWith("[]")) {
       return {
@@ -51,15 +48,26 @@ export function inflateSchema(raw: any): ISchema {
         }
       };
     }
+    if (["string", "number", "boolean"].indexOf(raw) >= 0) {
+      return {
+        type: raw
+      };
+    }
     return {
-      type: raw
+      type: "enum",
+      enum: [raw]
     };
   }
 
   if (raw instanceof Array) {
     return {
+      type: "enum",
       enum: raw
     };
+  }
+
+  if (typeof raw.type === "string") {
+    return raw;
   }
 
   if (typeof raw === "object") {
@@ -69,7 +77,7 @@ export function inflateSchema(raw: any): ISchema {
       required: []
     };
     for (const key of Object.keys(raw)) {
-      inflated.properties[key] = inflateSchema(raw[key]);
+      inflated.properties[key] = schema.inflateSchema(raw[key]);
       inflated.required.push(key);
     }
     return inflated;
