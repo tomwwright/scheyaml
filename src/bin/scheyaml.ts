@@ -29,9 +29,14 @@ interface IValidationFailure {
 export function cli() {
   commander
     .version(version)
-    .option("-t --targets <target>", "add a glob pattern for validation targets", collect, [])
-    .option("-s --schemas <glob>", "add a glob pattern for schemas", collect, [])
-    .option("-e --exclude <glob>", "add a glob pattern to exclude from schemas and targets", collect, [])
+    .option("-t --targets <target>", "add a glob pattern for validation targets", collect, defaultConfig.targetPatterns)
+    .option("-s --schemas <glob>", "add a glob pattern for schemas", collect, defaultConfig.schemaPatterns)
+    .option(
+      "-e --exclude <glob>",
+      "add a glob pattern to exclude from schemas and targets",
+      collect,
+      defaultConfig.excludePatterns
+    )
     .option("--schemas-only", "only load and validate schemas")
     .parse(process.argv);
 
@@ -66,13 +71,15 @@ export function buildConfig(commanderObj: CommanderStatic & ICliConfig): IScheya
 function runScheyaml(config: IScheyamlConfig) {
   let exitWithError = false;
 
-  const excludeFilenames = globFiles(config.excludePatterns);
-  console.log(config.excludePatterns);
-  console.log(excludeFilenames);
-  console.log("Excluding " + excludeFilenames.length);
-
   console.log(`scheyaml v${version}`);
   console.log();
+
+  const excludeFilenames = globFiles(config.excludePatterns);
+  if (excludeFilenames.length > 0) {
+    console.log(chalk.grey(`Excluding ${excludeFilenames.length} files...`));
+    console.log();
+  }
+
   process.stdout.write("Globbing schemas... ");
   const schemaFilePaths = _.difference(globFiles(config.schemaPatterns), excludeFilenames);
   console.log(chalk.yellow(`Found ${schemaFilePaths.length} schemas!`));
