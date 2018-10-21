@@ -31,6 +31,7 @@ export function cli() {
     .version(version)
     .option("-t --targets <target>", "add a glob pattern for validation targets", collect, [])
     .option("-s --schemas <glob>", "add a glob pattern for schemas", collect, [])
+    .option("-e --exclude <glob>", "add a glob pattern to exclude from schemas and targets", collect, [])
     .option("--schemas-only", "only load and validate schemas")
     .parse(process.argv);
 
@@ -55,16 +56,25 @@ export function buildConfig(commanderObj: CommanderStatic & ICliConfig): IScheya
     config.targetPatterns = commanderObj.targets;
   }
 
+  if (commanderObj.exclude.length > 0) {
+    config.excludePatterns = commanderObj.exclude;
+  }
+
   return config;
 }
 
 function runScheyaml(config: IScheyamlConfig) {
   let exitWithError = false;
 
+  const excludeFilenames = globFiles(config.excludePatterns);
+  console.log(config.excludePatterns);
+  console.log(excludeFilenames);
+  console.log("Excluding " + excludeFilenames.length);
+
   console.log(`scheyaml v${version}`);
   console.log();
   process.stdout.write("Globbing schemas... ");
-  const schemaFilePaths = globFiles(config.schemaPatterns);
+  const schemaFilePaths = _.difference(globFiles(config.schemaPatterns), excludeFilenames);
   console.log(chalk.yellow(`Found ${schemaFilePaths.length} schemas!`));
 
   console.log();
@@ -86,7 +96,7 @@ function runScheyaml(config: IScheyamlConfig) {
 
   if (!config.schemasOnly) {
     process.stdout.write("Globbing targets... ");
-    const targetFilePaths = _.difference(globFiles(config.targetPatterns), schemaFilePaths);
+    const targetFilePaths = _.difference(globFiles(config.targetPatterns), _.union(schemaFilePaths, excludeFilenames));
     console.log(chalk.yellow(`Found ${targetFilePaths.length} targets!`));
 
     console.log();

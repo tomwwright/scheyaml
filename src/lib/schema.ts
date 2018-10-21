@@ -61,12 +61,11 @@ export function inflateSchema(raw: any): ISchema {
 
   if (raw instanceof Array) {
     return {
-      type: "enum",
       enum: raw
     };
   }
 
-  if (typeof raw.type === "string") {
+  if (typeof raw.type === "string" || raw.enum instanceof Array) {
     return raw;
   }
 

@@ -196,11 +196,9 @@ describe("inflateSchema", () => {
 
   it("inflates enums", () => {
     expect(schema.inflateSchema(["1", "2", "3"])).toEqual({
-      type: "enum",
       enum: ["1", "2", "3"]
     });
     expect(schema.inflateSchema(["1", 2, false])).toEqual({
-      type: "enum",
       enum: ["1", 2, false]
     });
   });
@@ -244,7 +242,6 @@ describe("inflateSchema", () => {
               }
             },
             nestedenum: {
-              type: "enum",
               enum: ["1", "2"]
             }
           }
@@ -267,7 +264,6 @@ describe("inflateSchema", () => {
     expect(schema.inflateSchema(existingSchema)).toEqual(existingSchema);
 
     existingSchema = {
-      type: "enum",
       enum: [
         "value1",
         "value2",
