@@ -51,3 +51,17 @@ export function validationFailureError(error: ErrorObject) {
 
   return line;
 }
+
+export function validateLoadError(file: string, error: Error) {
+  const lines = paddington
+    .text(chalk.red("FAIL"), 8)
+    .text(chalk.red(`Error validating file: '${file}'`))
+    .newline()
+    .pad(12)
+    .text(chalk.red(error.message))
+    .toString();
+
+  paddington.clear();
+
+  return lines;
+}

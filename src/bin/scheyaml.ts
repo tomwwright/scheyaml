@@ -118,7 +118,7 @@ function runScheyaml(config: IScheyamlConfig) {
         } else if (e instanceof ScheyamlDirectiveError) {
           console.log(ui.validateNoSchemas(filePath));
         } else {
-          throw e;
+          console.log(ui.validateLoadError(filePath, e));
         }
       }
     }
