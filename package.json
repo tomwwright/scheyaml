@@ -1,6 +1,6 @@
 {
   "name": "scheyaml",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Straightforward schema validation for YAML",
   "bin": {
     "scheyaml": "build/bin/scheyaml.js"
