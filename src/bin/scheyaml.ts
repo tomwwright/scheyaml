@@ -140,7 +140,7 @@ function runScheyaml(config: IScheyamlConfig) {
     console.log();
 
     for (const failure of failures) {
-      ui.validationFailureHeading(failure.schemaId, failure.filePath);
+      console.log(ui.validationFailureHeading(failure.schemaId, failure.filePath));
       for (const error of failure.errors) {
         console.log();
         console.log(ui.validationFailureError(error));
