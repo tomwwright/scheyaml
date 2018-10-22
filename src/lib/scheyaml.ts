@@ -43,7 +43,10 @@ export class Scheyaml {
     for (const schemaId of schemaIds) {
       const schemaValidator = this.validator.getSchema(schemaId);
       if (!schemaValidator) {
-        throw new ScheyamlUnknownSchemaError(schemaId, `File '${targetPath}' declares an unknown schema '${schemaId}!`);
+        throw new ScheyamlUnknownSchemaError(
+          schemaId,
+          `File '${targetPath}' declares an unknown schema '${schemaId}'!`
+        );
       } else {
         const schemaValidation = schemaValidator(json);
 
